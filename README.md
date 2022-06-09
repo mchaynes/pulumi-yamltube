@@ -1,59 +1,30 @@
-# Pulumi Native Provider Boilerplate
+# YamlTube's Pulumi Provider
 
-We can't use [service accounts with YouTube](https://developers.google.com/youtube/v3/guides/auth/server-side-web-apps) which is a bummer:
+This repo contains a pulumi native provider for yamltube. It contacts and synchronizes YouTube playlists on your behalf.
 
-> Web server applications frequently also use service accounts to authorize API requests, particularly when calling Cloud APIs to access project-based data rather than user-specific data. Web server applications can use service accounts in conjunction with user authorization. Note that the YouTube Data API supports the service account flow only for YouTube content owners that own and manage multiple YouTube channels. Specifically, content owners can use service accounts to call API methods that support the onBehalfOfContentOwner request parameter.
+If you want to use YamlTube, go fork the [YamlTube repo](https://github.com/mchaynes/yamltube)
 
-This repo is a boilerplate showing how to create a native Pulumi provider.
+### What does a YouTube playlist in Yaml look like?
 
-### Background
+```yaml
+name: yaml-rickroll
+runtime: yaml
+description: A rick roll playlist
+resources:
+  rickroll:
+    type: yamltube:youtube:Playlist
+    properties:
+      title: "Rick Roll"
+      description: "I couldn't think of a better example"
+      visibility: public
+      videos:
+        - https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
-This repository is part of the [guide for authoring and publishing a Pulumi Package](https://www.pulumi.com/docs/guides/pulumi-packages/how-to-author).
-
-Learn about the concepts behind [Pulumi Packages](https://www.pulumi.com/docs/guides/pulumi-packages/#pulumi-packages).
-
-## Creating a Pulumi Native Provider
-
-You can search-replace `xyz` with the name of your desired provider as a starting point for creating a provider that manages resources in the target cloud.
-
-Most of the code for the provider implementation is in `pkg/provider/provider.go`.
-
-An example of using the single resource defined in this example is in `examples/simple`.
-
-A code generator is available which generates SDKs in TypeScript, Python, Go and .NET which are also checked in to the `sdk` folder. The SDKs are generated from a schema in `provider/cmd/pulumi-resource-xyz/schema.json`. This file should be kept aligned with the resources, functions and types supported by the provider implementation.
-
-Note that the generated provider plugin (`pulumi-resource-yamltube`) must be on your `PATH` to be used by Pulumi deployments. If creating a provider for distribution to other users, you should ensure they install this plugin to their `PATH`.
-
-## Pre-requisites
-
-Install the `pulumictl` cli from the [releases](https://github.com/pulumi/pulumictl/releases) page or follow the [install instructions](https://github.com/pulumi/pulumictl#installation)
-
-> NB: Usage of `pulumictl` is optional. If not using it, hard code the version in the [Makefile](Makefile) of when building explicitly pass version as `VERSION=0.0.1 make build`
-
-## Build and Test
-
-```bash
-# build and install the resource provider plugin
-$ make build install
-
-# test
-$ cd examples/simple
-$ yarn link @pulumi/xyz
-$ yarn install
-$ pulumi stack init test
-$ pulumi up
+outputs:
+  # output a link to the playlist
+  playlist: https://www.youtube.com/playlist?list=${rickroll.playlistId}
 ```
 
-## Configuring CI and releases
+### Does this support other Pulumi supported languages?
 
-### Third-party providers
-
-1. Follow the instructions laid out in the [deployment templates](./deployment-templates/README-DEPLOYMENT.md).
-
-## References
-
-Other resources for learning about the Pulumi resource model:
-
-- [Pulumi Kubernetes provider](https://github.com/pulumi/pulumi-kubernetes/blob/master/provider/pkg/provider/provider.go)
-- [Pulumi Terraform Remote State provider](https://github.com/pulumi/pulumi-terraform/blob/master/provider/cmd/pulumi-resource-terraform/provider.go)
-- [Dynamic Providers](https://www.pulumi.com/docs/intro/concepts/programming-model/#dynamicproviders)
+Not yet, because I'm lazy about getting publishing set up. I'll do it soon.

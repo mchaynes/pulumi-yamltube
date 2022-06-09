@@ -27,4 +27,4 @@ outputs:
 
 ### Does this support other Pulumi supported languages?
 
-Not yet, because I'm lazy about getting publishing set up. I'll do it soon.
+Not yet, because I'm lazy about getting publishing set up. I'll do it soon™

@@ -25,7 +25,6 @@ import (
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/diag"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/mapper"
@@ -57,12 +56,6 @@ type youtubeProvider struct {
 
 const (
 	playlistType = "yamltube:youtube:Playlist"
-
-	playlistId  = "playlistId"
-	title       = "title"
-	description = "description"
-	channelId   = "channelId"
-	videos      = "videos"
 )
 
 func makeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
@@ -94,25 +87,21 @@ func (k *youtubeProvider) Call(ctx context.Context, req *pulumirpc.CallRequest) 
 
 // Construct creates a new component resource.
 func (k *youtubeProvider) Construct(ctx context.Context, req *pulumirpc.ConstructRequest) (*pulumirpc.ConstructResponse, error) {
-	k.host.Log(ctx, diag.Warning, resource.URN("Consturct URN"), fmt.Sprintf("CheckConfig Called: %+v", req))
 	return nil, status.Error(codes.Unimplemented, "Construct is not yet implemented")
 }
 
 // CheckConfig validates the configuration for this provider.
 func (k *youtubeProvider) CheckConfig(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("CheckConfig Called: %+v", req))
 	return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
 }
 
 // DiffConfig diffs the configuration for this provider.
 func (k *youtubeProvider) DiffConfig(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("DiffConfig Called: %+v", req))
 	return &pulumirpc.DiffResponse{}, nil
 }
 
 // Configure configures the resource provider with "globals" that control its behavior.
 func (k *youtubeProvider) Configure(ctx context.Context, req *pulumirpc.ConfigureRequest) (*pulumirpc.ConfigureResponse, error) {
-	k.host.Log(ctx, diag.Warning, resource.URN("urn:pulumi:<Stack>::<Project>::<Qualified$Type$Name>::<Name>"), fmt.Sprintf("Configure Called: %+v", req))
 	y, err := youtube.New(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to youtube: %w", err)
@@ -141,7 +130,6 @@ func (k *youtubeProvider) StreamInvoke(req *pulumirpc.InvokeRequest, server pulu
 // required for correctness, violations thereof can negatively impact the end-user experience, as
 // the provider inputs are using for detecting and rendering diffs.
 func (k *youtubeProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Check Called: %+v", req))
 	urn := resource.URN(req.GetUrn())
 	ty := urn.Type()
 	if ty != playlistType {
@@ -157,7 +145,6 @@ func (k *youtubeProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest
 	}
 	news.PlaylistID = olds.PlaylistID
 	news.ChannelID = olds.ChannelID
-	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Check Modified News: %+v", news))
 	newsMarshalled, err := MarshalPlaylist(news)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal %w", err)
@@ -167,7 +154,6 @@ func (k *youtubeProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest
 
 // Diff checks what impacts a hypothetical update will have on the resource's properties.
 func (k *youtubeProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Diff Called: %+v", req))
 	urn := resource.URN(req.GetUrn())
 	ty := urn.Type()
 	if ty != playlistType {
@@ -190,9 +176,6 @@ func (k *youtubeProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) 
 	if err != nil {
 		return nil, err
 	}
-
-	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Diff Olds: %+v", olds))
-	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Diff News: %+v", news))
 
 	changes := pulumirpc.DiffResponse_DIFF_NONE
 	var diffs, replaces []string
@@ -268,7 +251,7 @@ func (k *youtubeProvider) Create(ctx context.Context, req *pulumirpc.CreateReque
 		return nil, err
 	}
 	return &pulumirpc.CreateResponse{
-		Id:         playlist.PlaylistID,
+		Id:         newPlaylist.PlaylistID,
 		Properties: outputProperties,
 	}, nil
 }
@@ -280,7 +263,6 @@ func (k *youtubeProvider) Read(ctx context.Context, req *pulumirpc.ReadRequest) 
 	if ty != playlistType {
 		return nil, fmt.Errorf("unknown resource type '%s'", ty)
 	}
-	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Read. (Inputs: %+v). (Properties: %+v)", req.GetInputs(), req.GetProperties()))
 	return &pulumirpc.ReadResponse{
 		Id:         req.GetId(),
 		Inputs:     req.GetInputs(),
@@ -388,19 +370,6 @@ func mustSetSchemaVersion(schemaStr string, version string) string {
 		panic(fmt.Errorf("failed to serialize versioned schema: %w", err))
 	}
 	return string(bytes)
-}
-
-func getArray(inputmap resource.PropertyMap, key string) []string {
-	val, ok := inputmap[resource.PropertyKey(key)]
-	if !ok || !val.HasValue() || !val.IsArray() {
-		return nil
-	}
-	arr := val.ArrayValue()
-	var strs []string
-	for _, v := range arr {
-		strs = append(strs, v.StringValue())
-	}
-	return strs
 }
 
 func UnmarshalPlaylist(props *structpb.Struct) (Playlist, error) {

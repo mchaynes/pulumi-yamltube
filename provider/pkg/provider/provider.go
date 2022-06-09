@@ -16,82 +16,122 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"google.golang.org/protobuf/types/known/emptypb"
-	"math/rand"
-	"time"
+	"reflect"
+	"sort"
+
+	"github.com/mchaynes/pulumi-yamltube/provider/pkg/internal/youtube"
+	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
 
 	"github.com/pulumi/pulumi/pkg/v3/resource/provider"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/diag"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/plugin"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/util/mapper"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 
-	pbempty "github.com/golang/protobuf/ptypes/empty"
+	"github.com/golang/protobuf/ptypes/empty"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 
-type xyzProvider struct {
-	host    *provider.HostClient
-	name    string
-	version string
+type Playlist struct {
+	PlaylistID  string   `json:"playlistId,omitempty"`
+	ChannelID   string   `json:"channelId,omitempty"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Visibility  string   `json:"visibility"`
+	Videos      []string `json:"videos"`
 }
 
-func makeProvider(host *provider.HostClient, name, version string) (pulumirpc.ResourceProviderServer, error) {
+type youtubeProvider struct {
+	host    *provider.HostClient
+	name    string
+	schema  string
+	version string
+	youtube *youtube.YouTube
+}
+
+const (
+	playlistType = "yamltube:youtube:Playlist"
+
+	playlistId  = "playlistId"
+	title       = "title"
+	description = "description"
+	channelId   = "channelId"
+	videos      = "videos"
+)
+
+func makeProvider(host *provider.HostClient, name, version, schema string) (pulumirpc.ResourceProviderServer, error) {
+	// inject version into schema
+	versionedSchema := mustSetSchemaVersion(schema, version)
+
 	// Return the new provider
-	return &xyzProvider{
+	return &youtubeProvider{
 		host:    host,
 		name:    name,
+		schema:  versionedSchema,
 		version: version,
 	}, nil
 }
 
-func (k *xyzProvider) Attach(context context.Context, req *pulumirpc.PluginAttach) (*emptypb.Empty, error) {
+func (k *youtubeProvider) Attach(context context.Context, req *pulumirpc.PluginAttach) (*empty.Empty, error) {
 	host, err := provider.NewHostClient(req.GetAddress())
 	if err != nil {
 		return nil, err
 	}
 	k.host = host
-	return &pbempty.Empty{}, nil
+	return &empty.Empty{}, nil
 }
 
 // Call dynamically executes a method in the provider associated with a component resource.
-func (k *xyzProvider) Call(ctx context.Context, req *pulumirpc.CallRequest) (*pulumirpc.CallResponse, error) {
+func (k *youtubeProvider) Call(ctx context.Context, req *pulumirpc.CallRequest) (*pulumirpc.CallResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "Call is not yet implemented")
 }
 
 // Construct creates a new component resource.
-func (k *xyzProvider) Construct(ctx context.Context, req *pulumirpc.ConstructRequest) (*pulumirpc.ConstructResponse, error) {
+func (k *youtubeProvider) Construct(ctx context.Context, req *pulumirpc.ConstructRequest) (*pulumirpc.ConstructResponse, error) {
+	k.host.Log(ctx, diag.Warning, resource.URN("Consturct URN"), fmt.Sprintf("CheckConfig Called: %+v", req))
 	return nil, status.Error(codes.Unimplemented, "Construct is not yet implemented")
 }
 
 // CheckConfig validates the configuration for this provider.
-func (k *xyzProvider) CheckConfig(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (k *youtubeProvider) CheckConfig(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("CheckConfig Called: %+v", req))
 	return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
 }
 
 // DiffConfig diffs the configuration for this provider.
-func (k *xyzProvider) DiffConfig(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (k *youtubeProvider) DiffConfig(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("DiffConfig Called: %+v", req))
 	return &pulumirpc.DiffResponse{}, nil
 }
 
 // Configure configures the resource provider with "globals" that control its behavior.
-func (k *xyzProvider) Configure(_ context.Context, req *pulumirpc.ConfigureRequest) (*pulumirpc.ConfigureResponse, error) {
+func (k *youtubeProvider) Configure(ctx context.Context, req *pulumirpc.ConfigureRequest) (*pulumirpc.ConfigureResponse, error) {
+	k.host.Log(ctx, diag.Warning, resource.URN("urn:pulumi:<Stack>::<Project>::<Qualified$Type$Name>::<Name>"), fmt.Sprintf("Configure Called: %+v", req))
+	y, err := youtube.New(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to youtube: %w", err)
+	}
+	k.youtube = y
 	return &pulumirpc.ConfigureResponse{}, nil
 }
 
 // Invoke dynamically executes a built-in function in the provider.
-func (k *xyzProvider) Invoke(_ context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+func (k *youtubeProvider) Invoke(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
 	tok := req.GetTok()
-	return nil, fmt.Errorf("Unknown Invoke token '%s'", tok)
+	return nil, fmt.Errorf("unknown Invoke token '%s'", tok)
 }
 
 // StreamInvoke dynamically executes a built-in function in the provider. The result is streamed
 // back as a series of messages.
-func (k *xyzProvider) StreamInvoke(req *pulumirpc.InvokeRequest, server pulumirpc.ResourceProvider_StreamInvokeServer) error {
+func (k *youtubeProvider) StreamInvoke(req *pulumirpc.InvokeRequest, server pulumirpc.ResourceProvider_StreamInvokeServer) error {
 	tok := req.GetTok()
-	return fmt.Errorf("Unknown StreamInvoke token '%s'", tok)
+	return fmt.Errorf("unknown StreamInvoke token '%s'", tok)
 }
 
 // Check validates that the given property bag is valid for a resource of the given type and returns
@@ -100,130 +140,230 @@ func (k *xyzProvider) StreamInvoke(req *pulumirpc.InvokeRequest, server pulumirp
 // representation of the properties as present in the program inputs. Though this rule is not
 // required for correctness, violations thereof can negatively impact the end-user experience, as
 // the provider inputs are using for detecting and rendering diffs.
-func (k *xyzProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+func (k *youtubeProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Check Called: %+v", req))
 	urn := resource.URN(req.GetUrn())
 	ty := urn.Type()
-	if ty != "xyz:index:Random" {
-		return nil, fmt.Errorf("Unknown resource type '%s'", ty)
+	if ty != playlistType {
+		return nil, fmt.Errorf("unknown resource type '%s'", ty)
 	}
-	return &pulumirpc.CheckResponse{Inputs: req.News, Failures: nil}, nil
+	news, err := UnmarshalPlaylist(req.GetNews())
+	if err != nil {
+		return nil, fmt.Errorf("check failed to unmarshal news: %w", err)
+	}
+	olds, err := UnmarshalPlaylist(req.GetOlds())
+	if err != nil {
+		return nil, err
+	}
+	news.PlaylistID = olds.PlaylistID
+	news.ChannelID = olds.ChannelID
+	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Check Modified News: %+v", news))
+	newsMarshalled, err := MarshalPlaylist(news)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal %w", err)
+	}
+	return &pulumirpc.CheckResponse{Inputs: newsMarshalled, Failures: nil}, nil
 }
 
 // Diff checks what impacts a hypothetical update will have on the resource's properties.
-func (k *xyzProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+func (k *youtubeProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Diff Called: %+v", req))
 	urn := resource.URN(req.GetUrn())
 	ty := urn.Type()
-	if ty != "xyz:index:Random" {
-		return nil, fmt.Errorf("Unknown resource type '%s'", ty)
+	if ty != playlistType {
+		return nil, fmt.Errorf("unknown resource type '%s'", ty)
 	}
-
-	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{
+		KeepUnknowns:     true,
+		SkipNulls:        true,
+		KeepOutputValues: true,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{
+		KeepUnknowns:     true,
+		SkipNulls:        true,
+		KeepOutputValues: true,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	d := olds.Diff(news)
+	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Diff Olds: %+v", olds))
+	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Diff News: %+v", news))
+
 	changes := pulumirpc.DiffResponse_DIFF_NONE
-	if d.Changed("length") {
-		changes = pulumirpc.DiffResponse_DIFF_SOME
+	var diffs, replaces []string
+	properties := map[string]bool{
+		"title":       false,
+		"description": false,
+		"visibility":  false,
+		"videos":      false,
 	}
+	if d := olds.Diff(news); d != nil {
+		for key, replace := range properties {
+			i := sort.SearchStrings(req.IgnoreChanges, key)
+			if i < len(req.IgnoreChanges) && req.IgnoreChanges[i] == key {
+				continue
+			}
 
+			if d.Changed(resource.PropertyKey(key)) {
+				changes = pulumirpc.DiffResponse_DIFF_SOME
+				diffs = append(diffs, key)
+
+				if replace {
+					replaces = append(replaces, key)
+				}
+			}
+		}
+	}
 	return &pulumirpc.DiffResponse{
 		Changes:  changes,
-		Replaces: []string{"length"},
+		Diffs:    diffs,
+		Replaces: replaces,
 	}, nil
 }
 
 // Create allocates a new instance of the provided resource and returns its unique ID afterwards.
-func (k *xyzProvider) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
+func (k *youtubeProvider) Create(ctx context.Context, req *pulumirpc.CreateRequest) (*pulumirpc.CreateResponse, error) {
 	urn := resource.URN(req.GetUrn())
 	ty := urn.Type()
-	if ty != "xyz:index:Random" {
-		return nil, fmt.Errorf("Unknown resource type '%s'", ty)
+	if ty != playlistType {
+		return nil, fmt.Errorf("unknown resource type '%s'", ty)
 	}
 
-	inputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true})
+	playlist, err := UnmarshalPlaylist(req.GetProperties())
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal request: %w", err)
+	}
+
+	created, err := k.youtube.CreatePlaylist(ctx, playlist.Title, playlist.Description, playlist.Visibility)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create playlist %q: %w", playlist.Title, err)
+	}
+
+	ids, err := youtube.ToVideoIds(playlist.Videos)
+	if err != nil {
+		return nil, err
+	}
+	_, err = k.youtube.SyncPlaylist(ctx, created.Id, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	if !inputs["length"].IsNumber() {
-		return nil, fmt.Errorf("Expected input property 'length' of type 'number' but got '%s", inputs["length"].TypeString())
+	newPlaylist := Playlist{
+		PlaylistID:  created.Id,
+		Title:       created.Snippet.Title,
+		Description: created.Snippet.Description,
+		ChannelID:   created.Snippet.ChannelId,
+		Visibility:  created.Status.PrivacyStatus,
+		// this stays the same, since we do the mapping to ids on every run
+		// and don't want to convert these into links
+		Videos: playlist.Videos,
 	}
-
-	n := int(inputs["length"].NumberValue())
-
-	// Actually "create" the random number
-	result := makeRandom(n)
-
-	outputs := map[string]interface{}{
-		"length": n,
-		"result": result,
-	}
-
-	outputProperties, err := plugin.MarshalProperties(
-		resource.NewPropertyMapFromMap(outputs),
-		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
-	)
+	outputProperties, err := MarshalPlaylist(newPlaylist)
 	if err != nil {
 		return nil, err
 	}
 	return &pulumirpc.CreateResponse{
-		Id:         result,
+		Id:         playlist.PlaylistID,
 		Properties: outputProperties,
 	}, nil
 }
 
 // Read the current live state associated with a resource.
-func (k *xyzProvider) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
+func (k *youtubeProvider) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
 	urn := resource.URN(req.GetUrn())
 	ty := urn.Type()
-	if ty != "xyz:index:Random" {
-		return nil, fmt.Errorf("Unknown resource type '%s'", ty)
+	if ty != playlistType {
+		return nil, fmt.Errorf("unknown resource type '%s'", ty)
 	}
-	return nil, status.Error(codes.Unimplemented, "Read is not yet implemented for 'xyz:index:Random'")
+	k.host.Log(ctx, diag.Warning, resource.URN(req.Urn), fmt.Sprintf("Read. (Inputs: %+v). (Properties: %+v)", req.GetInputs(), req.GetProperties()))
+	return &pulumirpc.ReadResponse{
+		Id:         req.GetId(),
+		Inputs:     req.GetInputs(),
+		Properties: req.GetProperties(),
+	}, nil
 }
 
 // Update updates an existing resource with new values.
-func (k *xyzProvider) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
+func (k *youtubeProvider) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
 	urn := resource.URN(req.GetUrn())
 	ty := urn.Type()
-	if ty != "xyz:index:Random" {
-		return nil, fmt.Errorf("Unknown resource type '%s'", ty)
+	if ty != playlistType {
+		return nil, fmt.Errorf("unknown resource type '%s'", ty)
 	}
 
-	// Our Random resource will never be updated - if there is a diff, it will be a replacement.
-	return nil, status.Error(codes.Unimplemented, "Update is not yet implemented for 'xyz:index:Random'")
+	old, err := UnmarshalPlaylist(req.GetOlds())
+	if err != nil {
+		return nil, err
+	}
+	new, err := UnmarshalPlaylist(req.GetNews())
+	if err != nil {
+		return nil, err
+	}
+	new.PlaylistID = old.PlaylistID
+	new.ChannelID = old.ChannelID
+	if !reflect.DeepEqual(old, new) {
+		_, err := k.youtube.UpdatePlaylist(ctx, new.PlaylistID, new.Title, new.Description, new.Visibility)
+		if err != nil {
+			return nil, fmt.Errorf("failed to update playlist: %w", err)
+		}
+
+		ids, err := youtube.ToVideoIds(new.Videos)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse video ids: %w", err)
+		}
+		_, err = k.youtube.SyncPlaylist(ctx, new.PlaylistID, ids)
+		if err != nil {
+			return nil, fmt.Errorf("failed to sync playlist videos: %w", err)
+		}
+	}
+
+	outputProperties, err := MarshalPlaylist(new)
+	if err != nil {
+		return nil, err
+	}
+	return &pulumirpc.UpdateResponse{
+		Properties: outputProperties,
+	}, nil
 }
 
 // Delete tears down an existing resource with the given ID.  If it fails, the resource is assumed
 // to still exist.
-func (k *xyzProvider) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*pbempty.Empty, error) {
+func (k *youtubeProvider) Delete(ctx context.Context, req *pulumirpc.DeleteRequest) (*empty.Empty, error) {
 	urn := resource.URN(req.GetUrn())
 	ty := urn.Type()
-	if ty != "xyz:index:Random" {
-		return nil, fmt.Errorf("Unknown resource type '%s'", ty)
+	if ty != playlistType {
+		return nil, fmt.Errorf("unknown resource type '%s'", ty)
+	}
+	var playlist Playlist
+	playlist, err := UnmarshalPlaylist(req.GetProperties())
+	if err != nil {
+		return nil, fmt.Errorf("failed to deserialize playlist properties: %w", err)
+	}
+	err = k.youtube.DeletePlaylist(ctx, playlist.PlaylistID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete playlist: %w", err)
 	}
 
-	// Note that for our Random resource, we don't have to do anything on Delete.
-	return &pbempty.Empty{}, nil
+	return &empty.Empty{}, nil
 }
 
 // GetPluginInfo returns generic information about this plugin, like its version.
-func (k *xyzProvider) GetPluginInfo(context.Context, *pbempty.Empty) (*pulumirpc.PluginInfo, error) {
+func (k *youtubeProvider) GetPluginInfo(context.Context, *empty.Empty) (*pulumirpc.PluginInfo, error) {
 	return &pulumirpc.PluginInfo{
 		Version: k.version,
 	}, nil
 }
 
 // GetSchema returns the JSON-serialized schema for the provider.
-func (k *xyzProvider) GetSchema(ctx context.Context, req *pulumirpc.GetSchemaRequest) (*pulumirpc.GetSchemaResponse, error) {
-	return &pulumirpc.GetSchemaResponse{}, nil
+func (k *youtubeProvider) GetSchema(ctx context.Context, req *pulumirpc.GetSchemaRequest) (*pulumirpc.GetSchemaResponse, error) {
+	return &pulumirpc.GetSchemaResponse{
+		Schema: k.schema,
+	}, nil
 }
 
 // Cancel signals the provider to gracefully shut down and abort any ongoing resource operations.
@@ -231,18 +371,63 @@ func (k *xyzProvider) GetSchema(ctx context.Context, req *pulumirpc.GetSchemaReq
 // creation error or an initialization error). Since Cancel is advisory and non-blocking, it is up
 // to the host to decide how long to wait after Cancel is called before (e.g.)
 // hard-closing any gRPC connection.
-func (k *xyzProvider) Cancel(context.Context, *pbempty.Empty) (*pbempty.Empty, error) {
-	// TODO
-	return &pbempty.Empty{}, nil
+func (k *youtubeProvider) Cancel(context.Context, *empty.Empty) (*empty.Empty, error) {
+	return &empty.Empty{}, nil
 }
 
-func makeRandom(length int) string {
-	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
-	charset := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-	result := make([]rune, length)
-	for i := range result {
-		result[i] = charset[seededRand.Intn(len(charset))]
+// mustSetSchemaVersion deserializes schemaStr from json, sets Version field
+// then serializes back to json string
+func mustSetSchemaVersion(schemaStr string, version string) string {
+	var spec schema.PackageSpec
+	if err := json.Unmarshal([]byte(schemaStr), &spec); err != nil {
+		panic(fmt.Errorf("failed to parse schema: %w", err))
 	}
-	return string(result)
+	spec.Version = version
+	bytes, err := json.Marshal(spec)
+	if err != nil {
+		panic(fmt.Errorf("failed to serialize versioned schema: %w", err))
+	}
+	return string(bytes)
+}
+
+func getArray(inputmap resource.PropertyMap, key string) []string {
+	val, ok := inputmap[resource.PropertyKey(key)]
+	if !ok || !val.HasValue() || !val.IsArray() {
+		return nil
+	}
+	arr := val.ArrayValue()
+	var strs []string
+	for _, v := range arr {
+		strs = append(strs, v.StringValue())
+	}
+	return strs
+}
+
+func UnmarshalPlaylist(props *structpb.Struct) (Playlist, error) {
+	inputProps, err := plugin.UnmarshalProperties(props, plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: false})
+	if err != nil {
+		return Playlist{}, err
+	}
+	inputs := inputProps.Mappable()
+	var out Playlist
+	err = mapper.MapIM(inputs, &out)
+	if err != nil {
+		return out, fmt.Errorf("failed to unmarshal: %w", err)
+	}
+	return out, nil
+}
+
+func MarshalPlaylist(p Playlist) (*structpb.Struct, error) {
+	outputs, err := mapper.New(&mapper.Opts{
+		IgnoreMissing:      true,
+		IgnoreUnrecognized: true,
+	}).Encode(p)
+	if err != nil {
+		return nil, err
+	}
+
+	return plugin.MarshalProperties(
+		resource.NewPropertyMapFromMap(outputs),
+		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
+	)
 }

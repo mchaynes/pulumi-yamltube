@@ -1,6 +1,10 @@
 # Pulumi Native Provider Boilerplate
 
-This repo is a boilerplate showing how to create a native Pulumi provider.  
+We can't use [service accounts with YouTube](https://developers.google.com/youtube/v3/guides/auth/server-side-web-apps) which is a bummer:
+
+> Web server applications frequently also use service accounts to authorize API requests, particularly when calling Cloud APIs to access project-based data rather than user-specific data. Web server applications can use service accounts in conjunction with user authorization. Note that the YouTube Data API supports the service account flow only for YouTube content owners that own and manage multiple YouTube channels. Specifically, content owners can use service accounts to call API methods that support the onBehalfOfContentOwner request parameter.
+
+This repo is a boilerplate showing how to create a native Pulumi provider.
 
 ### Background
 
@@ -12,13 +16,13 @@ Learn about the concepts behind [Pulumi Packages](https://www.pulumi.com/docs/gu
 
 You can search-replace `xyz` with the name of your desired provider as a starting point for creating a provider that manages resources in the target cloud.
 
-Most of the code for the provider implementation is in `pkg/provider/provider.go`.  
+Most of the code for the provider implementation is in `pkg/provider/provider.go`.
 
 An example of using the single resource defined in this example is in `examples/simple`.
 
-A code generator is available which generates SDKs in TypeScript, Python, Go and .NET which are also checked in to the `sdk` folder.  The SDKs are generated from a schema in `provider/cmd/pulumi-resource-xyz/schema.json`.  This file should be kept aligned with the resources, functions and types supported by the provider implementation.
+A code generator is available which generates SDKs in TypeScript, Python, Go and .NET which are also checked in to the `sdk` folder. The SDKs are generated from a schema in `provider/cmd/pulumi-resource-xyz/schema.json`. This file should be kept aligned with the resources, functions and types supported by the provider implementation.
 
-Note that the generated provider plugin (`pulumi-resource-xyz`) must be on your `PATH` to be used by Pulumi deployments.  If creating a provider for distribution to other users, you should ensure they install this plugin to their `PATH`.
+Note that the generated provider plugin (`pulumi-resource-yamltube`) must be on your `PATH` to be used by Pulumi deployments. If creating a provider for distribution to other users, you should ensure they install this plugin to their `PATH`.
 
 ## Pre-requisites
 
@@ -49,6 +53,7 @@ $ pulumi up
 ## References
 
 Other resources for learning about the Pulumi resource model:
-* [Pulumi Kubernetes provider](https://github.com/pulumi/pulumi-kubernetes/blob/master/provider/pkg/provider/provider.go)
-* [Pulumi Terraform Remote State provider](https://github.com/pulumi/pulumi-terraform/blob/master/provider/cmd/pulumi-resource-terraform/provider.go)
-* [Dynamic Providers](https://www.pulumi.com/docs/intro/concepts/programming-model/#dynamicproviders)
+
+- [Pulumi Kubernetes provider](https://github.com/pulumi/pulumi-kubernetes/blob/master/provider/pkg/provider/provider.go)
+- [Pulumi Terraform Remote State provider](https://github.com/pulumi/pulumi-terraform/blob/master/provider/cmd/pulumi-resource-terraform/provider.go)
+- [Dynamic Providers](https://www.pulumi.com/docs/intro/concepts/programming-model/#dynamicproviders)

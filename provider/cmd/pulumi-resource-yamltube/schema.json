@@ -1,0 +1,90 @@
+{
+  "name": "yamltube",
+  "version": "0.0.1",
+  "resources": {
+    "yamltube:youtube:Playlist": {
+      "properties": {
+        "channelId": {
+          "type": "string",
+          "description": "the id of the channel. https://www.youtube.com/channel/<channelId>"
+        },
+        "playlistId": {
+          "type": "string",
+          "descrption": "id of the playlist. https://www.youtube.com/playlist?list=<id>"
+        },
+        "title": {
+          "type": "string",
+          "description": "title of the playlist"
+        },
+        "description": {
+          "type": "string",
+          "description": "description of the playlist"
+        },
+        "videos": {
+          "type": "array",
+          "description": "array of youtube links or ids. (https://www.youtube.com/watch?v=dQw4w9WgXcQ, or dQw4w9WgXcQ)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "visibility": {
+          "type": "string",
+          "description": "visibility of the playlist. valid values are public, private, unlisted",
+          "default": "public"
+        }
+      },
+      "required": ["playlistId", "channelId", "title", "description", "videos", "visibility"],
+      "inputProperties": {
+        "channelId": {
+          "type": "string",
+          "description": "the id of the channel. https://www.youtube.com/channel/<channelId>"
+        },
+        "playlistId": {
+          "type": "string",
+          "descrption": "id of the playlist. https://www.youtube.com/playlist?list=<id>"
+        },
+        "title": {
+          "type": "string",
+          "description": "title of the playlist"
+        },
+        "description": {
+          "type": "string",
+          "description": "description of the playlist"
+        },
+        "videos": {
+          "type": "array",
+          "description": "array of youtube links or ids. (https://www.youtube.com/watch?v=dQw4w9WgXcQ, or dQw4w9WgXcQ)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "visibility": {
+          "type": "string",
+          "description": "visibility of the playlist. valid values are public, private, unlisted"
+        }
+      },
+      "requiredInputs": ["title", "description", "videos", "visibility"]
+    }
+  },
+  "language": {
+    "csharp": {
+      "packageReferences": {
+        "Pulumi": "3.*"
+      }
+    },
+    "go": {
+      "generateResourceContainerTypes": true,
+      "importBasePath": "github.com/mchaynes/pulumi-yamltube/sdk/go/yamltube"
+    },
+    "nodejs": {
+      "dependencies": {
+        "@pulumi/pulumi": "^3.0.0"
+      }
+    },
+    "python": {
+      "requires": {
+        "pulumi": ">=3.0.0,<4.0.0"
+      }
+    }
+  }
+}

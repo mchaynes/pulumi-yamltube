@@ -1,0 +1,16 @@
+name: yaml-rickroll
+runtime: yaml
+description: A rick roll playlist
+
+resources:
+  rickroll:
+    type: yamltube:youtube:Playlist
+    properties:
+      title: "Rick Roll"
+      description: "A rick roll playlist"
+      visibility: public
+      videos:
+        - https://www.youtube.com/watch?v=dQw4w9WgXcQ
+
+outputs:
+  playlist: https://www.youtube.com/playlist?list=${rickroll.playlistId}

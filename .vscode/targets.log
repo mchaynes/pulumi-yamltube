@@ -1,0 +1,497 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 3.81
+# Copyright (C) 2006  Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.
+# There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+# This program built for i386-apple-darwin11.3.0
+ 
+make: *** No rule to make target `all'.  Stop.
+
+
+# Make data base, printed on Wed Jun  8 22:34:28 2022
+
+# Variables
+
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+ 
+# environment
+ELECTRON_NO_ATTACH_CONSOLE = 1
+# makefile (from `Makefile', line 91)
+GO_TEST := go test -v -count=1 -cover -timeout 2h -parallel 4
+# environment
+VSCODE_LOG_NATIVE = false
+# environment
+NVM_INC = /Users/myles/.nvm/versions/node/v17.5.0/include/node
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# automatic
+@F = $(notdir $@)
+# makefile
+CURDIR := /Users/myles/projects/pulumi-yamltube
+# makefile
+SHELL = /bin/sh
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+# environment
+_ = /usr/bin/make
+# makefile (from `Makefile', line 12)
+PROVIDER_PATH := provider
+# makefile (from `Makefile', line 1)
+MAKEFILE_LIST :=  Makefile
+# makefile (from `Makefile', line 19)
+TESTPARALLELISM := 4
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# makefile (from `Makefile', line 11)
+VERSION = $(shell pulumictl get version)
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# makefile (from `Makefile', line 15)
+SCHEMA_FILE := provider/cmd/pulumi-resource-yamltube/schema.json
+# environment
+__CFBundleIdentifier = com.microsoft.VSCode
+# makefile (from `Makefile', line 4)
+PACKDIR := sdk
+# environment
+MCFLY_HISTORY_FORMAT = zsh-extended
+# environment
+P9K_SSH = 0
+# environment
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/xh/wp3p5nc94vd06g4lz156jbgw0000gn/T/vscode-ipc-cc793fea-a4a0-45c1-a7f7-9038f80e8f89.sock
+# environment
+VSCODE_CWD = /Users/myles/projects/pulumi-yamltube
+# environment
+GOPROXY = https://proxy.golang.org,direct
+# environment
+PATH = /Users/myles/.yarn/bin:/Users/myles/.config/yarn/global/node_modules/.bin:/usr/local/bin:/opt/homebrew/opt/openjdk/bin:/Users/myles/.nvm/versions/node/v17.5.0/bin:/opt/homebrew/bin:/opt/local/bin:/opt/local/sbin:/Users/myles/projects/emsdk:/Users/myles/projects/emsdk/upstream/emscripten:/Users/myles/projects/emsdk/node/14.18.2_64bit/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin
+# environment
+LSCOLORS = Gxfxcxdxbxegedabagacad
+# makefile (from `Makefile', line 10)
+CODEGEN := pulumi-gen-yamltube
+# makefile (from `Makefile', line 5)
+PROJECT := github.com/mchaynes/pulumi-yamltube
+# makefile (from `Makefile', line 16)
+GOPATH := /Users/myles/go
+# environment
+NVM_BIN = /Users/myles/.nvm/versions/node/v17.5.0/bin
+# environment
+EMSDK_NODE = /Users/myles/projects/emsdk/node/14.18.2_64bit/bin/node
+# environment
+VSCODE_LOG_STACK = false
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# default
+.FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
+# environment
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.4leqB4gYJl/Listeners
+# automatic
+%F = $(notdir $%)
+# default
+MAKEFILES := 
+# makefile (from `Makefile', line 18)
+WORKING_DIR := /Users/myles/projects/pulumi-yamltube
+# environment
+VSCODE_PIPE_LOGGING = true
+# environment
+SSL_CERT_FILE = /Users/myles/projects/emsdk/python/3.9.2_64bit/lib/python3.9/site-packages/certifi/cacert.pem
+# environment
+PWD = /Users/myles/projects/pulumi-yamltube
+# makefile (from `Makefile', line 13)
+VERSION_PATH := provider/pkg/version.Version
+# makefile (from `Makefile', line 7)
+NUGET_PKG_NAME := Pulumi.yamltube
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+EMSDK_PYTHON = /Users/myles/projects/emsdk/python/3.9.2_64bit/bin/python3
+# environment
+GOMODCACHE = /Users/myles/go/pkg/mod
+# environment
+HOME = /Users/myles
+# default
+MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
+# environment
+VSCODE_CLI = 1
+# environment
+VSCODE_CODE_CACHE_PATH = /Users/myles/Library/Application Support/Code/CachedData/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
+# environment
+LOGNAME = myles
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+# environment
+NVM_CD_FLAGS = -q
+# environment
+MCFLY_SESSION_ID = qtU4psuTQ2ud1Udo34XltU8W
+# environment
+ZSH = /Users/myles/.oh-my-zsh
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# environment
+XPC_FLAGS = 0x0
+# environment
+HISTFILE = /Users/myles/.zsh_history
+# default
+MAKE = $(MAKE_COMMAND)
+# environment
+LC_TERMINAL = iTerm2
+# environment
+SHLVL = 3
+# default
+MAKE_VERSION := 3.81
+# environment
+USER = myles
+# makefile
+.DEFAULT_GOAL := ensure
+# default
+MAKECMDGOALS := all
+# environment
+TERM_SESSION_ID = w0t0p0:2F0722EC-9944-41CD-975C-371E054AAA56
+# environment
+LESS = -R
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# default
+MAKE_COMMAND := /Applications/Xcode.app/Contents/Developer/usr/bin/make
+# environment
+TERM_PROGRAM = iTerm.app
+# default
+.VARIABLES := 
+# environment
+TMPDIR = /var/folders/xh/wp3p5nc94vd06g4lz156jbgw0000gn/T/
+# automatic
+*F = $(notdir $*)
+# environment
+VSCODE_IPC_HOOK = /Users/myles/Library/Application Support/Code/1.67.2-main.sock
+# makefile
+MAKEFLAGS = Rrqp
+# makefile (from `Makefile', line 6)
+NODE_MODULE_NAME := @pulumi/yamltube
+# environment
+MFLAGS = -Rrqp
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+TERM_PROGRAM_VERSION = 3.4.15
+# environment
+NVM_DIR = /Users/myles/.nvm
+# environment
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.10697835.10697841.699BA39D-F3AB-42A2-B239-D1B62F068681
+# environment
+LC_TERMINAL_VERSION = 3.4.15
+# makefile (from `Makefile', line 3)
+PACK := yamltube
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# automatic
++F = $(notdir $+)
+# environment
+ITERM_SESSION_ID = w0t0p0:2F0722EC-9944-41CD-975C-371E054AAA56
+# environment
+COLORFGBG = 7;0
+# environment
+COLORTERM = truecolor
+# environment
+__CF_USER_TEXT_ENCODING = 0x1F5:0x0:0x0
+# environment
+COMMAND_MODE = unix2003
+# environment
+MCFLY_HISTORY = /var/folders/xh/wp3p5nc94vd06g4lz156jbgw0000gn/T/mcfly.XXXXXXXX.TPdv5SgP
+# environment
+EM_CONFIG = /Users/myles/projects/emsdk/.emscripten
+# automatic
+<F = $(notdir $<)
+# environment
+ITERM_PROFILE = Default
+# makefile (from `Makefile', line 1)
+PROJECT_NAME := Pulumi YamlTube Resource Provider
+# environment
+PAGER = less
+# environment
+LC_ALL = C
+# makefile (from `Makefile', line 9)
+PROVIDER := pulumi-resource-yamltube
+# environment
+P9K_TTY = old
+# automatic
+^F = $(notdir $^)
+# default
+SUFFIXES := 
+# default
+.INCLUDE_DIRS = /usr/local/include
+# environment
+MAKELEVEL := 0
+# environment
+LANG = C
+# environment
+TERM = xterm-256color
+# environment
+EMSDK = /Users/myles/projects/emsdk
+# environment
+_P9K_TTY = /dev/ttys000
+# environment
+VSCODE_PID = 1167
+# variable set hash-table stats:
+# Load=112/1024=11%, Rehash=0, Collisions=8/155=5%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 16777236, inode 12193778): 16 files, no impossibilities.
+
+# 16 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+# Not a target:
+all:
+#  Command-line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has not been updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+.PHONY: build
+ 
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+install_nodejs_sdk::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 112):
+	-yarn unlink --cwd $(WORKING_DIR)/sdk/nodejs/bin
+	yarn link --cwd $(WORKING_DIR)/sdk/nodejs/bin
+	
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-06-05 12:02:27
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+gen::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 27):
+	(cd provider && go build -o $(WORKING_DIR)/bin/${CODEGEN} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/$(CODEGEN))
+	
+
+provider_debug::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 34):
+	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -gcflags="all=-N -l" -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
+	
+
+nodejs_sdk::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+# makefile (from `Makefile', line 51)
+# VERSION := v0.0.1-alpha.1654287535+cb401317.dirty
+# variable set hash-table stats:
+# Load=1/32=3%, Rehash=0, Collisions=0/3=0%
+#  commands to execute (from `Makefile', line 53):
+	rm -rf sdk/nodejs
+	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} nodejs $(SCHEMA_FILE) $(CURDIR)
+	cd ${PACKDIR}/nodejs/ && \
+	yarn install && \
+	yarn run tsc && \
+	cp -R scripts/ bin && \
+	cp ../../README.md ../../LICENSE package.json yarn.lock bin/ && \
+	sed -i.bak 's/$${VERSION}/$(VERSION)/g' bin/package.json && \
+	rm ./bin/package.json.bak
+	
+
+build:: gen provider dotnet_sdk go_sdk nodejs_sdk python_sdk
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+dotnet_sdk::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+# makefile (from `Makefile', line 39)
+# DOTNET_VERSION := 0.0.1-alpha.1654287535+cb401317.dirty
+# variable set hash-table stats:
+# Load=1/32=3%, Rehash=0, Collisions=0/3=0%
+#  commands to execute (from `Makefile', line 41):
+	rm -rf sdk/dotnet
+	$(WORKING_DIR)/bin/$(CODEGEN) -version=${DOTNET_VERSION} dotnet $(SCHEMA_FILE) $(CURDIR)
+	cd ${PACKDIR}/dotnet/&& \
+	echo "${DOTNET_VERSION}" >version.txt && \
+	dotnet build /p:Version=${DOTNET_VERSION}
+	
+
+install_go_sdk::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 109):
+	#target intentionally blank
+	
+
+test_all::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 94):
+	cd provider/pkg && $(GO_TEST) ./...
+	cd tests/sdk/nodejs && $(GO_TEST) ./...
+	cd tests/sdk/python && $(GO_TEST) ./...
+	cd tests/sdk/dotnet && $(GO_TEST) ./...
+	cd tests/sdk/go && $(GO_TEST) ./...
+	
+
+install_python_sdk::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 106):
+	#target intentionally blank
+	
+
+python_sdk::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+# makefile (from `Makefile', line 63)
+# PYPI_VERSION := 0.0.1a1654287535+dirty
+# variable set hash-table stats:
+# Load=1/32=3%, Rehash=0, Collisions=0/3=0%
+#  commands to execute (from `Makefile', line 65):
+	rm -rf sdk/python
+	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} python $(SCHEMA_FILE) $(CURDIR)
+	cp README.md ${PACKDIR}/python/
+	cd ${PACKDIR}/python/ && \
+	python3 setup.py clean --all 2>/dev/null && \
+	rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
+	sed -i.bak -e 's/^VERSION = .*/VERSION = "$(PYPI_VERSION)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION)"/g' ./bin/setup.py && \
+	rm ./bin/setup.py.bak && \
+	cd ./bin && python3 setup.py build sdist
+	
+
+ensure::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 22):
+	cd provider && go mod tidy
+	cd sdk && go mod tidy
+	cd tests && go mod tidy
+	
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+go_sdk::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 48):
+	rm -rf sdk/go
+	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} go $(SCHEMA_FILE) $(CURDIR)
+	
+
+provider::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 30):
+	(cd provider && VERSION=${VERSION} go generate cmd/${PROVIDER}/main.go)
+	(cd provider && go build -o $(WORKING_DIR)/bin/${PROVIDER} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" $(PROJECT)/${PROVIDER_PATH}/cmd/$(PROVIDER))
+	
+
+only_build:: build
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+install_dotnet_sdk::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 101):
+	rm -rf $(WORKING_DIR)/nuget/$(NUGET_PKG_NAME).*.nupkg
+	mkdir -p $(WORKING_DIR)/nuget
+	find . -name '*.nupkg' -print -exec cp -p {} ${WORKING_DIR}/nuget \;
+	
+
+lint::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 82):
+	for DIR in "provider" "sdk" "tests" ; do \
+	pushd $$DIR && golangci-lint run -c ../.golangci.yml --timeout 10m && popd ; \
+	done
+	
+
+test_provider::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 37):
+	cd provider/pkg && go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM} ./...
+	
+
+install:: install_nodejs_sdk install_dotnet_sdk
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 88):
+	cp $(WORKING_DIR)/bin/${PROVIDER} ${GOPATH}/bin
+	
+
+# files hash-table stats:
+# Load=23/1024=2%, Rehash=0, Collisions=0/69=0%
+# VPATH Search Paths
+
+# No `vpath' search paths.
+
+# No general (`VPATH' variable) search path.
+
+# # of strings in strcache: 1
+# # of strcache buffers: 1
+# strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
+# strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
+ 
+
+# Finished Make data base on Wed Jun  8 22:34:28 2022
+
+ 

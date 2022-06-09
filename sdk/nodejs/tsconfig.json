@@ -15,7 +15,8 @@
     "files": [
         "index.ts",
         "provider.ts",
-        "random.ts",
-        "utilities.ts"
+        "utilities.ts",
+        "youtube/index.ts",
+        "youtube/playlist.ts"
     ]
 }

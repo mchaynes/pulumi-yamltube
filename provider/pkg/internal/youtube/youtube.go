@@ -1,9 +1,7 @@
 package youtube
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -30,8 +28,8 @@ type PlaylistDiffResult struct {
 	Deletes []PlaylistItemDelete
 }
 
-func New(ctx context.Context) (*YouTube, error) {
-	client := getClient(youtube.YoutubeScope)
+func New(ctx context.Context, clientSecret, appCreds string) (*YouTube, error) {
+	client := getClient(youtube.YoutubeScope, clientSecret, appCreds)
 	service, err := youtube.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create youtube service: %w", err)
@@ -212,14 +210,4 @@ func (y *YouTube) GetPlaylistItems(ctx context.Context, playlistId string) ([]*y
 		firstLoop = false
 	}
 	return items, nil
-}
-
-func mustPrettyPrint(f func() ([]byte, error)) {
-	data, err := f()
-	if err != nil {
-		panic(fmt.Errorf("failed to marshal data to json: %w", err))
-	}
-	buf := bytes.NewBuffer([]byte{})
-	json.Indent(buf, data, " ", " ")
-	fmt.Println(buf.String())
 }

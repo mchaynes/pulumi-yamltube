@@ -18,8 +18,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"reflect"
 	"sort"
+	"strings"
 
 	"github.com/mchaynes/pulumi-yamltube/provider/pkg/internal/youtube"
 	"github.com/pulumi/pulumi/pkg/v3/codegen/schema"
@@ -92,6 +94,7 @@ func (k *youtubeProvider) Construct(ctx context.Context, req *pulumirpc.Construc
 
 // CheckConfig validates the configuration for this provider.
 func (k *youtubeProvider) CheckConfig(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+
 	return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
 }
 
@@ -102,7 +105,11 @@ func (k *youtubeProvider) DiffConfig(ctx context.Context, req *pulumirpc.DiffReq
 
 // Configure configures the resource provider with "globals" that control its behavior.
 func (k *youtubeProvider) Configure(ctx context.Context, req *pulumirpc.ConfigureRequest) (*pulumirpc.ConfigureResponse, error) {
-	y, err := youtube.New(ctx)
+	ytc, err := ToConfig(req)
+	if err != nil {
+		return nil, err
+	}
+	y, err := youtube.New(ctx, ytc.GoogleClientSecret, ytc.GoogleAppCreds)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to youtube: %w", err)
 	}
@@ -399,4 +406,38 @@ func MarshalPlaylist(p Playlist) (*structpb.Struct, error) {
 		resource.NewPropertyMapFromMap(outputs),
 		plugin.MarshalOptions{KeepUnknowns: true, SkipNulls: true},
 	)
+}
+
+type YamlTubeConfig struct {
+	GoogleAppCreds     string
+	GoogleClientSecret string
+}
+
+func ToConfig(req *pulumirpc.ConfigureRequest) (*YamlTubeConfig, error) {
+	config := make(map[string]string)
+
+	for key, val := range req.GetVariables() {
+		config[strings.TrimPrefix(key, "yamltube:config:")] = val
+	}
+
+	get := func(key, env string) (string, error) {
+		if val, ok := os.LookupEnv(env); ok {
+			return val, nil
+		}
+		if val, ok := config[key]; ok {
+			return val, nil
+		}
+		return "", fmt.Errorf("config %q not set nor is env var %q", key, env)
+	}
+
+	ytc := YamlTubeConfig{}
+	var err error
+	if ytc.GoogleAppCreds, err = get("google-application-credentials", "GOOGLE_APPLICATION_CREDENTIALS"); err != nil {
+		return nil, err
+	}
+
+	if ytc.GoogleClientSecret, err = get("google-client-secret", "GOOGLE_CLIENT_SECRET"); err != nil {
+		return nil, err
+	}
+	return &ytc, nil
 }
